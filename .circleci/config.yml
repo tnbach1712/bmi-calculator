@@ -29,7 +29,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - c0:23:08:b3:df:bb:ba:c7:32:35:86:ea:c3:ee:af:e0
+            - 2e:5e:38:0c:1c:00:b2:59:95:b5:0c:42:d3:28:e1:fe
       - run:
           name: Install Ansible
           command: |
@@ -37,10 +37,10 @@ jobs:
       - run:
           name: Run Playbook and Configure server
           command: |
-            ansible-playbook -i [inventory-file] [playbook-file]
+            ansible-playbook -i ./ansible/inventory ./ansible/main.yml
 workflows:
   say-hello-workflow:
     jobs:
-    - create_infra
-    # - configure_infrastructure
+    # - create_infra
+    - configure_infrastructure
   
