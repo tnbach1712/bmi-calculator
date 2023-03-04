@@ -4,7 +4,7 @@
   # hosts: ubuntu
   # Use the public IP if the VM is already created
   # hosts: web-server
-  hosts: 44.212.220.5
+  hosts: web-server
   user: ubuntu
   become: true
   become_method: sudo
