@@ -36,7 +36,7 @@ jobs:
       - run:
           name: Run Playbook and Configure server
           command: |
-            ansible-playbook -i ./ansible/inventory ./ansible/main.yml
+            yes | ansible-playbook -i ./ansible/inventory ./ansible/main.yml
 workflows:
   say-hello-workflow:
     jobs:
