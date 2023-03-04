@@ -40,6 +40,6 @@ jobs:
 workflows:
   say-hello-workflow:
     jobs:
-    # - create_infra
-    - configure_infrastructure
+    - create_infra
+    # - configure_infrastructure
   
