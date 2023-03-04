@@ -27,6 +27,8 @@ jobs:
       - image: python:3.7-alpine3.11
     steps:
       - checkout
+      - run: |
+        export ANSIBLE_HOST_KEY_CHECKING=False
       - add_ssh_keys:
           fingerprints:
             - 2e:5e:38:0c:1c:00:b2:59:95:b5:0c:42:d3:28:e1:fe
