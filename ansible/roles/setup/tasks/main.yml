@@ -44,3 +44,7 @@
   become: yes
   shell: |
     pm2 start /home/ubuntu/web/index.js -f
+  register: print_result
+- name: Print message
+  debug:
+    msg: "{{ print_result.stdout_lines }}"
