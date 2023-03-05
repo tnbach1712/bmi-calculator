@@ -5,6 +5,17 @@ defaultds: &defaults
   docker:
       - image: circleci/node:13.8.0
 
+commands:
+  destroy_environment:
+    steps:
+      - run:
+          name:  Destroy environment
+          # ${CIRCLE_WORKFLOW_ID} is a Built-in environment variable 
+          # ${CIRCLE_WORKFLOW_ID:0:5} takes the first 5 chars of the variable CIRCLE_CI_WORKFLOW_ID 
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:7}
+
 jobs:
   create_infra:
     docker:
@@ -17,10 +28,10 @@ jobs:
             echo ${AWS_ACCESS_KEY_ID}
             echo ${AWS_SECRET_ACCESS_KEY}
             echo ${AWS_DEFAULT_REGION}
-            echo ${CIRCLE_WORKFLOW_ID:0:5}
+            echo ${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation deploy \
                 --template-file ./devops/cloudfomation/main.yaml \
-                --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
+                --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:7} \
                 --region us-east-1
   configure_infrastructure: 
     docker:
@@ -58,11 +69,15 @@ jobs:
             else
               return 1
             fi
-
+      - destroy_environment
 workflows:
   say-hello-workflow:
     jobs:
-    # - create_infra
-    - configure_infrastructure
-    - smoke_test
+    - create_infra
+    - configure_infrastructure:
+        requires:
+          - create_infra
+    - smoke_test:
+        requires:
+          - configure_infrastructure
   
