@@ -1,0 +1,17 @@
+---
+- name: "Install apache"
+  become: true
+  apt:
+    name: apache2
+    state: latest
+    update_cache: yes
+- name: Allow copy folder
+  shell: |
+    echo "hello world"
+    chmod -R 777 /var/www/
+  become: true
+- name: "Copy home page"
+  copy:
+    src: index.html
+    dest: /var/www/html/
+    force: yes

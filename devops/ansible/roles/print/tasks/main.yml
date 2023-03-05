@@ -1,0 +1,7 @@
+---
+- name: Print env 
+  shell: echo $PATH
+  register: print_result
+- name: Print message
+  debug:
+    msg: "{{ print_result.stdout_lines }}"

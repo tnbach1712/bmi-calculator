@@ -1,0 +1,37 @@
+---
+# - name: Install nodejs
+#   become: true
+#   yum:
+#     name: nodejs
+#     state: latest
+#     update_cache: yes
+
+# - name: Install npm
+#   become: true
+#   yum:
+#     name: npm
+#     state: latest
+#     update_cache: yes
+
+- name: "install pm2"
+  become: true
+  npm:
+    name: pm2
+    global: true
+    production: true
+    state: present
+  
+# - name: Create workspace 
+#   become: true
+#   file:
+#     path: /home/ec2-user/web
+#     state: directory
+  
+# - name: Copy sourcecode
+#   copy:
+#     src: index.js
+#     dest: /home/ec2-user/web
+#     force: yes
+
+- name: Start web server
+  ansible.builtin.shell: pm2 start /home/ec2-user/web/index.js -f
