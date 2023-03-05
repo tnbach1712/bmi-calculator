@@ -43,7 +43,7 @@
 - name: Executing node
   become: yes
   shell: |
-    pm2 start /home/ubuntu/web/index.js -f
+    pm2 start /home/ubuntu/web/index.js -f || true
   register: print_result
 - name: Print message
   debug:
