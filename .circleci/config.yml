@@ -38,9 +38,27 @@ jobs:
           name: Run Playbook and Configure server
           command: |
             yes | ansible-playbook -i ./ansible/inventory ./ansible/main.yml
+  smoke_test:
+    docker:
+      - image: alpine:latest
+    steps:
+      - checkout
+      - run:
+          name: Get content udacity blog
+          command: |
+            URL="https://blog.udacity.com/"
+            # Test if website exists
+            if curl -s --head ${URL} 
+            then
+              return 0
+            else
+              return 1
+            fi
+
 workflows:
   say-hello-workflow:
     jobs:
     # - create_infra
     - configure_infrastructure
+    - smoke_test
   

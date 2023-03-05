@@ -1,0 +1,6 @@
+# ---
+
+# - name: smoke_test
+#     docker:
+#     - image: alpine:latest
+     
