@@ -44,6 +44,10 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install CURL
+          command: |
+            apk add --update curl
+      - run:
           name: Get content udacity blog
           command: |
             URL="https://blog.udacity.com/"
