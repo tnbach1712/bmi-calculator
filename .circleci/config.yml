@@ -64,7 +64,7 @@ jobs:
             aws s3 rm "s3://${OldBucketID}" --recursive
       - run:
           name: Run when on fail
-          command: Echo "On fail"
+          command: echo "On fail"
           when: on_fail
 
 workflows:
