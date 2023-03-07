@@ -25,7 +25,7 @@ jobs:
       - run:
           name: Sync file
           command: |
-            aws s3 sync s3://mybucket-${CIRCLE_WORKFLOW_ID:0:7}/ . 
+            aws s3 sync . s3://mybucket-${CIRCLE_WORKFLOW_ID:0:7}/
       - persist_to_workspace:
           root: ~/
           paths: 
