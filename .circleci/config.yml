@@ -31,9 +31,9 @@ jobs:
             list-exports --query "Exports[?Name==\`S3BucketName\`].Value" \
             --no-paginate --output text > ~/S3BucketName.txt
       - persist_to_workspace:
-        root: ~/
-        paths: 
-          - S3BucketName.txt
+          root: ~/
+          paths: 
+            - S3BucketName.txt
   promote_to_production:
     docker:
       - image: amazon/aws-cli
