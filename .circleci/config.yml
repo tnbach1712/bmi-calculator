@@ -16,10 +16,16 @@ jobs:
             --template-file ./devops/cloudformation/s3.yaml \
             --stack-name stack-create-bucket-${CIRCLE_WORKFLOW_ID:0:7} \
             --parameter-overrides S3BucketName="mybucket-${CIRCLE_WORKFLOW_ID:0:7}"
+
+            echo stack-create-bucket-${CIRCLE_WORKFLOW_ID:0:7} > ~/StackName.txt
       - run:
           name: Sync file
           command: |
             aws s3 sync s3://mybucket-${CIRCLE_WORKFLOW_ID:0:7}/ . 
+      - persist_to_workspace:
+          root: ~/
+          paths: 
+            - StackName.txt
   # copy_content_s3:
   get_last_deployment:
     docker:
@@ -65,7 +71,9 @@ jobs:
           name: Remove s3 legacy
           command: |
             export OldBucketID=$(cat ~/S3BucketName.txt)
-            aws s3 rm "s3://${OldBucketID}" --recursive
+            export OldStackName=$(cat ~/StackName.txt)
+            # aws s3 rm "s3://${OldBucketID}" --recursive
+            aws cloudformation delete-stack  --stack-name $OldStackName
       - run:
           name: Run when on fail
           command: echo "On fail"
@@ -81,4 +89,5 @@ workflows:
           - create_s3
     - remove_legacy:
         requires:
+          - get_last_deployment
           - promote_to_production
