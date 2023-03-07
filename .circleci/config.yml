@@ -12,8 +12,8 @@ jobs:
       - run: 
           name: Create Bucket s3 from cloudfomatin staack
           command: |
-            aws cloudfomation deploy  \
-            --template-file ./devops/cloudfomation/s3.yaml \
+            aws cloudformation deploy  \
+            --template-file ./devops/cloudformation/s3.yaml \
             --stack-name stack-create-bucket-${CIRCLE_WORKFLOW_ID:0:7} \
             --parameter-overrides MyBucketName="mybucket-${CIRCLE_WORKFLOW_ID:0:7}"
   
@@ -43,7 +43,7 @@ jobs:
           name: Create CloudFront from Cloudformation
           command: |
             aws cloudformation deploy \
-            --template-file devops/cloudfomation/cloudfront.yaml \
+            --template-file devops/cloudformation/cloudfront.yaml \
             --stack-name production-distro \
             --parameter-overrides S3BucketName="mybucket-${CIRCLE_WORKFLOW_ID:0:7}"
   
