@@ -1,0 +1,83 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+defaultds: &defaults
+  docker:
+      - image: circleci/node:13.8.0
+
+commands:
+  destroy_environment:
+    steps:
+      - run:
+          name:  Destroy environment
+          # ${CIRCLE_WORKFLOW_ID} is a Built-in environment variable 
+          # ${CIRCLE_WORKFLOW_ID:0:5} takes the first 5 chars of the variable CIRCLE_CI_WORKFLOW_ID 
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:7}
+
+jobs:
+  create_infra:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run: 
+          name: Create stack 
+          command: |
+            echo ${AWS_ACCESS_KEY_ID}
+            echo ${AWS_SECRET_ACCESS_KEY}
+            echo ${AWS_DEFAULT_REGION}
+            echo ${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation deploy \
+                --template-file ./devops/cloudfomation/main.yaml \
+                --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:7} \
+                --region us-east-1
+  configure_infrastructure: 
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - 29:35:f7:41:eb:47:fd:8a:ac:f4:1f:18:4d:4b:55:e1
+      - run:
+          name: Install Ansible
+          command: |
+            apk add --update ansible
+      - run:
+          name: Run Playbook and Configure server
+          command: |
+            yes | ansible-playbook -i ./ansible/inventory ./ansible/main.yml
+  smoke_test:
+    docker:
+      - image: alpine:latest
+    steps:
+      - checkout
+      - run:
+          name: Install CURL
+          command: |
+            apk add --update curl
+      - run:
+          name: Get content udacity blog
+          command: |
+            URL="https://blog.udacity.com/"
+            # Test if website exists
+            if curl -s --head ${URL} 
+            then
+              return 0
+            else
+              return 1
+            fi
+      - destroy_environment
+workflows:
+  say-hello-workflow:
+    jobs:
+    - create_infra
+    - configure_infrastructure:
+        requires:
+          - create_infra
+    - smoke_test:
+        requires:
+          - configure_infrastructure
+  

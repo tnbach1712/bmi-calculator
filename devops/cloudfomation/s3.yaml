@@ -1,0 +1,26 @@
+Parameters:
+  S3BucketName:
+    Type: String
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties: 
+      BucketName: !Ref S3BucketName
+      AccessControl: PublicRead
+      WebsiteConfiguration: 
+        IndexDocument: index.html
+        ErrorDocument: error.html
+    DeletionPolicy: Retain
+  WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Statement:
+        - Sid: PublicReadForGetBucketObjects
+          Effect: Allow
+          Principal: '*'
+          Action: s3:GetObject
+          Resource: !Join ['', ['arn:aws:s3:::', !Ref 'S3Bucket', /*]]
+
