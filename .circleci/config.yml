@@ -58,6 +58,10 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
+          name: Install tar utility
+          command: |
+            yum install -y tar gzip
+      - run:
           name: Remove s3 legacy
           command: |
             export OldBucketID=$(cat ~/S3BucketName.txt)
