@@ -16,7 +16,10 @@ jobs:
             --template-file ./devops/cloudformation/s3.yaml \
             --stack-name stack-create-bucket-${CIRCLE_WORKFLOW_ID:0:7} \
             --parameter-overrides S3BucketName="mybucket-${CIRCLE_WORKFLOW_ID:0:7}"
-  
+      - run:
+          name: Sync file
+          command: |
+            aws s3 sync s3://mybucket-${CIRCLE_WORKFLOW_ID:0:7}/ . 
   # copy_content_s3:
   get_last_deployment:
     docker:
