@@ -1,0 +1,25 @@
+# route:
+#   receiver: email-me
+#   group_by: [instanceDown]
+# receivers:
+# - name: email-me
+#   email_configs:
+#   - to: acb1zbq@gmail.com
+#     from: anhdayem818@gmail.com
+#     smarthost: smtp.gmail.com:587
+#     auth_username: anhdayem818@gmail.com
+#     auth_identity: anhdayem818@gmail.com
+#     auth_password: Ghidaidi1
+
+global:
+  resolve_timeout: 1m
+  slack_api_url: https://hooks.slack.com/services/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
+
+route:
+  receiver: 'slack-notifications'
+
+receivers:
+  - name: 'slack-notifications'
+    slack_configs:
+    - channel: '#alert-0'
+      send_resolved: true
