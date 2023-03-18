@@ -1,0 +1,97 @@
+version: 2.1
+defaultds: &defaults
+  docker:
+      - image: circleci/node:13.8.0
+
+jobs:
+  create_s3:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install tar utility
+          command: |
+            yum install -y tar gzip
+      - run: 
+          name: Create Bucket s3 from cloudfomatin staack
+          command: |
+            aws cloudformation deploy  \
+            --template-file ./devops/cloudformation/s3.yaml \
+            --stack-name stack-create-bucket-${CIRCLE_WORKFLOW_ID:0:7} \
+            --parameter-overrides S3BucketName="mybucket-${CIRCLE_WORKFLOW_ID:0:7}"
+
+            echo stack-create-bucket-${CIRCLE_WORKFLOW_ID:0:7} > ~/StackName.txt
+      - run:
+          name: Sync file
+          command: |
+            aws s3 sync . s3://mybucket-${CIRCLE_WORKFLOW_ID:0:7}/
+      - persist_to_workspace:
+          root: ~/
+          paths: 
+            - StackName.txt
+  # copy_content_s3:
+  get_last_deployment:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run: yum install -y tar gzip
+      - run: 
+          name: Fetch and save the old pipeline ID (bucket name) responsible for the last release.
+          command: |
+            aws cloudformation \
+            list-exports --query "Exports[?Name==\`S3BucketName\`].Value" \
+            --no-paginate --output text > ~/S3BucketName.txt
+      - persist_to_workspace:
+          root: ~/
+          paths: 
+            - S3BucketName.txt
+  promote_to_production:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Create CloudFront from Cloudformation
+          command: |
+            aws cloudformation deploy \
+            --template-file devops/cloudformation/cloudfront.yaml \
+            --stack-name production-distro \
+            --parameter-overrides S3BucketName="mybucket-${CIRCLE_WORKFLOW_ID:0:7}"
+  
+  remove_legacy:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install tar utility
+          command: |
+            yum install -y tar gzip
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Remove s3 legacy
+          command: |
+            export OldBucketID=$(cat ~/S3BucketName.txt)
+            export OldStackName=$(cat ~/StackName.txt)
+            # aws s3 rm "s3://${OldBucketID}" --recursive
+            aws cloudformation delete-stack  --stack-name $OldStackName
+      - run:
+          name: Run when on fail
+          command: echo "On fail"
+          when: on_fail
+
+workflows:
+  deploy_new_version:
+    jobs:
+    - create_s3
+    - get_last_deployment
+    - promote_to_production:
+        requires:
+          - create_s3
+    - remove_legacy:
+        requires:
+          - get_last_deployment
+          - promote_to_production

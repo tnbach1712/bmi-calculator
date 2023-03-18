@@ -1,7 +1,8 @@
 ---
 - name: exercise
-  hosts: localhost #all
+  hosts: node-export-2 #all
   roles:
-  - prepare
-  - print
-  - apache
+  # - prepare
+  # - print
+  # - apache
+  - prometheus
