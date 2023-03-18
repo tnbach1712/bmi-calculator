@@ -7,8 +7,14 @@
 - name: Extract node_exporter-1.0.1.linux-amd64.tar.gz node_exporter-1.0.1.linux-amd64
   ansible.builtin.unarchive:
     src: https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz
-    dest: /usr/local/bin/node_exporter
+    dest: node_exporter-1.0.1.linux-amd64
     remote_src: yes
+    
+- name: Copy node_exporter
+  copy:
+    src: node_exporter-1.0.1.linux-amd64/node_exporter
+    dest: /usr/local/bin/node_exporter
+    force: yes
 
 - name: Configure a service
   copy:
