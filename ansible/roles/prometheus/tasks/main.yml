@@ -43,3 +43,4 @@
     state: started
     enabled: true
     name: node-exporter
+    no_block: true
