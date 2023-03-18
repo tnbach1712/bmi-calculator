@@ -19,7 +19,7 @@ commands:
 jobs:
   configure_infrastructure: 
     docker:
-      - image: python:slim # 3.7-alpine3.11
+      - image: python:alpine3.17
     steps:
       - checkout
       - add_ssh_keys:
