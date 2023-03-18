@@ -16,6 +16,7 @@
     src: /home/ubuntu/node_exporter-1.0.1.linux-amd64/node_exporter
     remote_src: true
     dest: /usr/local/bin/node_exporter
+    mode: +x
     force: yes
 
 - name: Configure a service
