@@ -44,3 +44,7 @@
     enabled: true
     name: node-exporter
     no_block: true
+
+- name: Echo
+  shell: |
+    echo Success || true
