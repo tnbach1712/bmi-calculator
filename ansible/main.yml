@@ -4,7 +4,7 @@
   # hosts: ubuntu
   # Use the public IP if the VM is already created
   # hosts: web-server
-  hosts: web-server
+  hosts: node-export-2
   user: ubuntu
   become: true
   become_method: sudo
